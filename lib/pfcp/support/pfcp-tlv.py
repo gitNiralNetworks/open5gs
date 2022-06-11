@@ -101,7 +101,7 @@ def get_cells(cells):
         return None
     comment = cells[2].text.encode('ascii', 'ignore').decode('utf-8')
     comment = re.sub('\n|\"|\'|\\\\', '', comment);
-    #print comment
+    #print(comment)
     ie_type = re.sub('\s*$', '', re.sub('\'\s*\n*\s*\(NOTE.*\)*', '', cells[-1].text))
 
     #if ie_type.find('Usage Report') != -1:
@@ -133,11 +133,24 @@ def get_cells(cells):
         ie_type = 'PFCPSRRsp-Flags'
     elif ie_type.find('IPv4 Configuration Parameters (IP4CP)') != -1:
         ie_type = 'IP4CP'
+    elif ie_type.find('QoS Information') != -1:
+        ie_type = 'QoS Information in GTP-U Path QoS Report'
+    elif ie_type.find('RDS Configuration Information') != -1:
+        ie_type = 'Provide RDS configuration information'
+    elif ie_type.find('IP Multicast Addressing Info') != -1:
+        ie_type = 'IP Multicast Addressing Info within PFCP Session Establishment Request'
+    elif ie_type.find('MAC Addressed Detected') != -1:
+        ie_type = 'MAC address'
+    elif ie_type.find('Join IP Multicast Information') != -1:
+        ie_type = 'Join IP Multicast Information IE within Usage Report'
+    elif ie_type.find('Leave IP Multicast Information') != -1:
+        ie_type = 'Leave IP Multicast Information IE within Usage Report'
     if ie_type not in type_list.keys():
         assert False, "Unknown IE type : [" \
                 + cells[-1].text + "]" + "(" + ie_type + ")"
     presence = cells[1].text
     ie_value = re.sub('\s*\n*\s*\([^\)]*\)*', '', cells[0].text)
+    ie_value = re.sub('\n', '', ie_value)
     if ie_value[len(ie_value)-1] == ' ':
         ie_value = ie_value[:len(ie_value)-1]
 
@@ -231,6 +244,7 @@ else:
         if key.find('Reserved') != -1:
             continue
         key = re.sub('\s*\n*\s*\([^\)]*\)*', '', key)
+        key = re.sub('\n', '', key)
         msg_list[key] = { "type": type }
         write_file(f, "msg_list[\"" + key + "\"] = { \"type\" : \"" + type + "\" }\n")
     f.close()
@@ -300,7 +314,15 @@ else:
 
                 row = table.rows[0];
 
-                d_print("Table Index = %d[%s]\n" % (i, row.cells[num].text))
+                d_print("rows len : %d\n" % len(table.rows[0].cells))
+#                for local_cell in table.rows[0].cells:
+#                    d_print("cell : %s\n" % local_cell.text);
+
+
+                d_print("Table Index = %d[%d:%s]\n" % (i, num, row.cells[num].text))
+
+#                if i == 37 or i == 46 or i == 51 or i == 54 or i == 75 or i == 87 or i == 89:
+                    continue;
 
                 if len(re.findall('\d+', row.cells[num].text)) == 0:
                     continue;

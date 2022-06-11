@@ -128,6 +128,7 @@ def get_cells(cells):
     presence = cells[1].text
     presence = re.sub('\n', '', presence);
     ie_value = re.sub('\s*\n*\s*\([^\)]*\)*', '', cells[0].text)
+    ie_value = re.sub('\n', '', ie_value);
     comment = cells[2].text.encode('ascii', 'ignore').decode('utf-8')
     comment = re.sub('\n|\"|\'|\\\\', '', comment);
 
@@ -241,6 +242,7 @@ else:
         if key.find('Reserved') != -1:
             continue
         key = re.sub('\s*\n*\s*\([^\)]*\)*', '', key)
+        key = re.sub('\n', '', key);
         msg_list[key] = { "type": type }
         write_file(f, "msg_list[\"" + key + "\"] = { \"type\" : \"" + type + "\" }\n")
     f.close()
